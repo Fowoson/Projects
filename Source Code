@@ -1,0 +1,80 @@
+# I imported different in-built modules that aided me in the creation of the decryption tool.
+import random # the "random" module will allow me to use different methods to generate random values
+import string # the "string" module will allow me to create a variable where I can store different characters, numbers and symbols
+import hashlib # the "hashlib" module allows me use different hashing algorithm to encrypt different values, the hashing algorithm
+               # in question is sha256
+import csv
+
+character = string.printable # This variable store all the different characters, numbers and symbols.
+character_list = list(string.printable) # This variable puts all the different characters, numbers and symbols obtained above into a list.
+
+#I created 3 different function,
+
+def menu(): # I created a function called menu that allows the user to navigate through the decryption app.
+    print("********** Clifford's Decryption Tool **********")
+    choice =input("Manual Input or File Input: ")
+    if choice == int(1) or choice.lower() == "manual input":
+        print(decryption())                                      #This conditional statement allows the user to choose between two different options,
+    elif choice == int(2) or choice.lower() == "file input":     # they can choose between manually inserting the hashes or if to get them from a file.
+        print(file_input())
+    else:
+        print("Unknown selection, please try again")        #If the wrong value is inserted the this message will print out and the menu function will re-run.
+        print()
+        menu()
+    return
+
+
+#Task 1-3  (User input requests and decryption process)
+
+def decryption():
+    password = input("Enter hash: ")
+    #password = list(map(str, input("Enter a multiple value: ").split()))     #<--- It store multiple values entered by the user however
+                                                                            # I didn't have enough time to research how to properly implement it in the decryption phase
+    #p_ls = password                                                        # related to the multiple user input above
+    guess = ""                                                              #guesses are stored within this variable
+    while (guess != password):                                              # this is a while loop that forces the program to generate different words until it matches the user input
+        guess = random.choices(character_list, k= random.randrange(1,5))   # guess has been reassigned to a variable which contains random letters from the variable with all the characters
+                                                                        # k stands for the amount of characters that will be printed out I've set it to range between 1 and 5
+        # print(guess)
+        guess_joint = "".join(guess)    # All the letters that are randomly created will be joined together using this method and the printed out below
+        print(guess)
+        hash = hashlib.sha256((guess_joint).encode("utf-8")).hexdigest()   # Once the letters have been joined together they will be hashed through the use of sha256 encryption algorithm and the comparison with the user input will begin
+        #print(guess , hash.upper())
+        if hash.upper() == password:                        # This conditional statement ensures that the plaintext password is printed if it's hashed (encrypted) equivalent matches the user's input
+            print("Here's your password: " + guess_joint)
+            break # brakes the loop
+    return # return the values within the function
+
+#Task 2
+#The function belows takes inputs from a file and runs them through the decryption algorithm which is going to brute force it.
+def file_input():
+    filename = "C:/Users/cliff/Desktop/Hash project/sha256_hashes.csv" # this variable store the file from which we'll take the different values
+                                                        #NOTE!!! the location of the file will need to be changed according to where it is stored or how it's named
+    with open(filename,"r") as f:
+       csv_reader = csv.reader(f)
+
+       next(csv_reader)                             # This method allows me to skip the header when reading the file
+
+       for line in csv_reader:                  # This for loop allows me to pick a value from the file by specifying which line to read
+        print("Hash picked: " + line[0])
+        guess = ""
+        while (guess != line[0]):
+            guess = random.choices(character_list, k= random.randrange(1,5))  # this is a while loop that forces the program to generate different words until it matches the user input
+                                                                              # guess has been reassigned to a variable which contains random letters from the variable with all the characters
+                                                                        # k stands for the amount of characters that will be printed out I've set it to range between 1 and 5
+            # print(guess)
+            guess_joint = "".join(guess)   # All the letters that are randomly created will be joined together using this method and the printed out below
+            print(guess)
+            hash = hashlib.sha256((guess_joint).encode("utf-8")).hexdigest() # Once the letters have been joined together they will be hashed through the use of sha256 encryption algorithm and the comparison with the user input will begin
+            # print(guess , hash.upper())
+            if hash.upper() == line[0]:
+                print("-----------------------")
+                print("Here's your password: " + guess_joint)  # This conditional statement ensures that the plaintext password is printed if it's hashed (encrypted) equivalent matches the user's input
+                break
+        return    # return the values within the function
+
+
+
+
+menu()
+file_input()
